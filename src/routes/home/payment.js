@@ -1,4 +1,4 @@
-const paymentController = require("../controllers/payment");
+const paymentController = require("../../controllers/payment");
 const router = require("express").Router();
 
 router.post("/create-url", paymentController.createUrl);

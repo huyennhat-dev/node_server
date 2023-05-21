@@ -1,5 +1,5 @@
-const userAdminController = require("../controllers/admin/user");
-const authjwt = require("../middleware/authenticate_token");
+const userAdminController = require("../../controllers/admin/user");
+const authjwt = require("../../middleware/authenticate_token");
 
 const router = require("express").Router();
 
