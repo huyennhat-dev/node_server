@@ -4,7 +4,6 @@ const slug = require("slug");
 const categoriesController = {
   index: async (req, res) => {
     try {
-      console.log('ok')
       const categories = await categoriesModel
         .find()
         .populate(["products", "status"]);

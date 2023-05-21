@@ -13,7 +13,13 @@ const productSchema = new mongoose.Schema(
     price: { type: Number, required: true, min: 0 },
     quantity: { type: Number, required: true, min: 0 },
     purchases: { type: Number, min: 0, default: 0 },
-    rate: { type: Number, default: 0 },
+    rates: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "rate",
+      },
+    ],
+    star: { type: Number, default: 5 },
     sale: { type: Number, default: 0 },
     desciption: { type: String, required: true, min: 6, max: 5000 },
     categories: {
