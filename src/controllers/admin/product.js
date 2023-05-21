@@ -73,14 +73,14 @@ const productController = {
         data.sale = data.sale / 100;
       }
 
-      for (let i = 0; i <= 100; i++) {
-        data.name = req.body.name + "thứ" + i;
-        const product = await productModel.create(data);
-        await categoriesModel.updateOne(
-          { _id: data.categories },
-          { $push: { products: product._id } }
-        ); 
-      }
+      // for (let i = 0; i <= 100; i++) {
+      // data.name = req.body.name + "thứ" + i;
+      const product = await productModel.create(data);
+      await categoriesModel.updateOne(
+        { _id: data.categories },
+        { $push: { products: product._id } }
+      );
+      // }
       return res.status(200).json({ status: true });
     } catch (error) {
       return res.status(500).json({ status: false, error });
