@@ -32,4 +32,11 @@ router.use("/api/v1/home/product", homeProductRoute);
 // Payment route
 router.use("/api/v1/payment", paymentRoute);
 
+router.get("/home", async (req, res, next) => {
+  return res.status(200).json({
+    title: "Express Testing",
+    message: "The app is working properly!",
+  });
+});
+
 module.exports = router;
