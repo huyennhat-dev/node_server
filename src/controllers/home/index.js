@@ -1,6 +1,9 @@
 const { productModel } = require("../../models/product");
 
 const indexController = {
+  test: (req, res) => {
+    return res.json({ status: true, message: "api hoat dong" });
+  },
   recommendProduct: async (req, res) => {
     try {
       console.log(1);
