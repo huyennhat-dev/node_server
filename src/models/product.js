@@ -21,7 +21,7 @@ const productSchema = new mongoose.Schema(
     ],
     star: { type: Number, default: 5 },
     sale: { type: Number, default: 0 },
-    desciption: { type: String, required: true, min: 6, max: 5000 },
+    description: { type: String, required: true, min: 6, max: 5000 },
     categories: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,

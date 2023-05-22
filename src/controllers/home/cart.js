@@ -2,6 +2,38 @@ const cartModel = require("../../models/home/cart");
 const { productModel } = require("../../models/product");
 
 const cartController = {
+  show: async (req, res) => {
+    try {
+      const uid = req.user.sub.id;
+
+      const cart = await cartModel.findOne({ user: uid }).populate({
+        path: "products.product",
+        select: "name photos price",
+      });
+
+      if (!cart) {
+        return res
+          .status(404)
+          .json({ status: false, message: "Không tìm thấy giỏ hàng" });
+      }
+      const cartItems = [];
+
+      for (const item of cart.products) {
+        const { product, quantity } = item;
+        const productInfo = await productModel
+          .findById(product)
+          .select("-status -description");
+        if (productInfo) {
+          const cartItem = { product: productInfo, quantity };
+          cartItems.push(cartItem);
+        }
+      }
+
+      return res.status(200).json({ status: true, carts: cartItems });
+    } catch (error) {
+      res.status(500).json({ status: false, error: error });
+    }
+  },
   create: async (req, res) => {
     try {
       const uid = req.user.sub.id;
@@ -57,40 +89,23 @@ const cartController = {
           newCart.push(newCartItem);
         }
       }
-
       await cart.updateOne({ $set: newCart });
+      res.status(200).json({ status: true });
     } catch (error) {
       res.status(500).json({ status: false, error: error });
     }
   },
-  show: async (req, res) => {
+  updateQuantity: async (req, res) => {
+    const { id, quantity } = req.body;
+    const uid = req.user.sub.id;
+
     try {
-      const uid = req.user.sub.id;
-
-      const cart = await cartModel.findOne({ user: uid }).populate({
-        path: "products.product",
-        select: "name photos price",
-      });
-
-      if (!cart) {
-        return res
-          .status(404)
-          .json({ status: false, message: "Không tìm thấy giỏ hàng" });
-      }
-      const cartItems = [];
-
-      for (const item of cart.products) {
-        const { product, quantity } = item;
-        const productInfo = await productModel
-          .findById(product)
-          .select("-status");
-        if (productInfo) {
-          const cartItem = { product: productInfo, quantity };
-          cartItems.push(cartItem);
-        }
-      }
-
-      return res.status(200).json({ status: true, carts: cartItems });
+      const cart = await cartModel.findOneAndUpdate(
+        { user: uid, "products.product": id },
+        { $set: { "products.$.quantity": quantity } },
+        { new: true }
+      );
+      res.status(200).json({ status: true });
     } catch (error) {
       res.status(500).json({ status: false, error: error });
     }
@@ -98,6 +113,7 @@ const cartController = {
   delete: async (req, res) => {
     try {
       const uid = req.user.sub.id;
+      console.log(1);
       const productId = req.params.id;
       const cart = await cartModel.findOne({ user: uid });
 
