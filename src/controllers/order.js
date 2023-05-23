@@ -138,7 +138,7 @@ const orderController = {
         await orderModel.findByIdAndUpdate(vnp_Params["vnp_TxnRef"], {
           $set: { orderStatus: orderStatus._id },
         });
-        return res.redirect("http://localhost:5173/checkout/success");
+        return res.redirect("https://dacn-1-web.vercel.app/checkout/success");
       }
     } catch (error) {
       return res.status(500).json({ status: false, error });
