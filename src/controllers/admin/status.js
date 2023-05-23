@@ -1,4 +1,4 @@
-const { statusModel } = require("../../models/admin/status");
+const { statusModel } = require("../../models/status");
 const slug = require("slug");
 const statusController = {
   create: async (req, res) => {

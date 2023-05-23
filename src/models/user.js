@@ -28,6 +28,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
     },
     address: { type: String, min: 10 },
+    
     role: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,

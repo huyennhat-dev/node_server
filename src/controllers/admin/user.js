@@ -1,6 +1,6 @@
 const { userModel } = require("../../models/user");
-const { statusModel } = require("../../models/admin/status");
-const { roleModel } = require("../../models/admin/role");
+const { statusModel } = require("../../models/status");
+const { roleModel } = require("../../models/role");
 const {
   CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET,
