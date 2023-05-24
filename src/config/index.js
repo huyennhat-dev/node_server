@@ -9,4 +9,5 @@ module.exports = {
   VNP_URL: process.env.VNP_URL,
   VNP_API: process.env.VNP_API,
   VNP_RETURNURL: process.env.VNP_RETURNURL,
+  CLIENT_URL: process.env.CLIENT_URL,
 };

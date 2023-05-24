@@ -11,6 +11,7 @@ const {
   VNP_API,
   VNP_RETURNURL,
   VNP_URL,
+  CLIENT_URL,
 } = require("../config");
 
 const sortObject = (obj) => {
@@ -138,8 +139,25 @@ const orderController = {
         await orderModel.findByIdAndUpdate(vnp_Params["vnp_TxnRef"], {
           $set: { orderStatus: orderStatus._id },
         });
-        return res.redirect("https://dacn-1-web.vercel.app/checkout/success");
+        return res.redirect(`${CLIENT_URL}/checkout/success`);
       }
+    } catch (error) {
+      return res.status(500).json({ status: false, error });
+    }
+  },
+  showOrderByUser: async (req, res) => {
+    try {
+      const uid = req.user.sub.id;
+      const orders = await orderModel
+        .find({ user: uid })
+        .populate({ path: "products.product", select: "-description" })
+        .populate({
+          path: "orderStatus",
+          select: "-createdAt -updatedAt",
+        })
+        .sort({ createdAt: -1 });
+      const orderStatus = await orderStatusModel.find();
+      return res.status(200).json({ status: true, orderStatus, orders });
     } catch (error) {
       return res.status(500).json({ status: false, error });
     }
