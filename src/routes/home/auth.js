@@ -4,6 +4,6 @@ const authjwt = require("../../middleware/authenticate_token");
 const router = require("express").Router();
 
 router.post("/login", authController.login);
-router.get("/check-login", authjwt, authController.checkLogin);
+router.post("/login-google", authController.loginGoogle);
 
 module.exports = router;
