@@ -32,6 +32,11 @@ const productSchema = new mongoose.Schema(
       required: true,
       ref: "status",
     },
+    extraPerson: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "admin",
+    },
   },
   {
     timestamps: true,

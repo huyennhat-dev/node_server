@@ -4,10 +4,12 @@ const rateSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
       required: true,
     },
     product: {
       type: mongoose.Schema.Types.ObjectId,
+      ref: "product",
       required: true,
     },
     star: { type: Number, default: 5 },
@@ -20,4 +22,4 @@ const rateSchema = new mongoose.Schema(
 
 const rateModel = mongoose.model("rate", rateSchema);
 
-module.exports = {rateModel};
+module.exports = { rateModel };

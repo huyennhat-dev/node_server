@@ -1,4 +1,4 @@
-const { userModel } = require("../../models/user");
+const { adminModel } = require("../../models/admin");
 const { statusModel } = require("../../models/status");
 const { roleModel } = require("../../models/role");
 const {
@@ -21,7 +21,7 @@ cloudinary.config({
 const userAdminController = {
   index: async (req, res) => {
     try {
-      const users = await userModel
+      const users = await adminModel
         .find()
         .select("-password")
         .populate(["role", "status"]);
@@ -82,10 +82,10 @@ const userAdminController = {
         }
 
         data.password = await bcrypt.hash(data.password, 10);
-        const user = await userModel.create(data);
+        const user = await adminModel.create(data);
         await roleModel.updateOne(
           { _id: data.role },
-          { $push: { users: user._id } }
+          { $push: { admins: user._id } }
         );
 
         return res.status(200).json({ status: true });
@@ -105,9 +105,9 @@ const userAdminController = {
   edit: async (req, res) => {
     try {
       const id = req.params.id;
-      const user = await userModel
+      const user = await adminModel
         .findById(id)
-        .populate({ path: "role", select: "-users" })
+        .populate({ path: "role", select: "-admins" })
         .populate({ path: "status" });
       if (user) {
         const roles = [];
@@ -156,7 +156,7 @@ const userAdminController = {
         });
       }
 
-      const user = await userModel.findById(id);
+      const user = await adminModel.findById(id);
       if (user) {
         if (data.photo && data.photo.length > 100) {
           if (user.photo) {
@@ -174,10 +174,10 @@ const userAdminController = {
           data.password = await bcrypt.hash(data.password, 10);
         }
         if (data.role) {
-          await roleModel.updateMany({ users: id }, { $pull: { users: id } });
+          await roleModel.updateMany({ admins: id }, { $pull: { admins: id } });
           await roleModel.updateOne(
             { _id: data.role },
-            { $push: { users: user._id } }
+            { $push: { admins: user._id } }
           );
         }
         await user.updateOne({ $set: data });
@@ -191,8 +191,8 @@ const userAdminController = {
   delete: async (req, res) => {
     try {
       const id = req.params.id;
-      await roleModel.updateMany({ users: id }, { $pull: { users: id } });
-      const user = await userModel.findById(id);
+      await roleModel.updateMany({ admins: id }, { $pull: { admins: id } });
+      const user = await adminModel.findById(id);
 
       if (user.photo) {
         await cloudinary.uploader.destroy(`images/users/${publicId(user.photo)}`);

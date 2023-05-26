@@ -1,7 +1,14 @@
 const mongoose = require("mongoose");
 
-const userSchema = new mongoose.Schema(
+const adminSchema = new mongoose.Schema(
   {
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      min: 6,
+      max: 40,
+    },
     email: {
       type: String,
       required: true,
@@ -10,7 +17,7 @@ const userSchema = new mongoose.Schema(
       min: 6,
       max: 40,
     },
-    password: { type: String, min: 8 },
+    password: { type: String, required: true, min: 8 },
     name: { type: String, required: true, min: 4, max: 40 },
 
     photo: { type: String },
@@ -18,22 +25,28 @@ const userSchema = new mongoose.Schema(
       type: String,
       min: 10,
       max: 10,
+      unique: true,
     },
     address: { type: String, min: 10 },
-    type: {
-      type: String,
+
+    role: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "role",
     },
+
     status: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "status",
     },
+    products: [{ type: mongoose.Schema.Types.ObjectId, ref: "product" }],
   },
   {
     timestamps: true,
   }
 );
 
-let userModel = mongoose.model("user", userSchema);
+let adminModel = mongoose.model("admin", adminSchema);
 
-module.exports = { userModel };
+module.exports = { adminModel };

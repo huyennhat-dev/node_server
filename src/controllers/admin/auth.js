@@ -1,4 +1,4 @@
-const { userModel } = require("../../models/user");
+const { adminModel } = require("../../models/admin");
 const {
   CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET,
@@ -19,7 +19,10 @@ const authAdminController = {
   login: async (req, res) => {
     try {
       const { username, password } = req.body;
-      const user = await userModel.findOne({ username });
+      const user = await adminModel
+        .findOne({ username })
+        .populate({ path: "status" })
+        .populate({ path: "role" });
 
       if (!user) {
         return res.status(400).json({
@@ -27,6 +30,16 @@ const authAdminController = {
           error: {
             keyPattern: {
               message: "Tài khoản hoặc mật khẩu không đúng!",
+            },
+          },
+        });
+      }
+      if (user.status.slug == "tam-khoa") {
+        return res.status(400).json({
+          success: false,
+          error: {
+            keyPattern: {
+              message: "Tài khoản này đã bị khóa!",
             },
           },
         });
@@ -39,8 +52,7 @@ const authAdminController = {
             id: user._id,
             name: user.name,
             photo: user.photo,
-            role: user.role,
-            status: user.status,
+            role: user.role.slug,
           }),
         });
       } else {

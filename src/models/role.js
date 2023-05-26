@@ -7,10 +7,10 @@ const roleSchema = new mongoose.Schema(
       required: true,
       unique: true,
     },
-    users: [
+    admins: [
       {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "user",
+        ref: "admin",
       },
     ],
   },

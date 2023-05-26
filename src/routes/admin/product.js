@@ -1,13 +1,15 @@
 const productController = require("../../controllers/admin/product");
+const { authPage } = require("../../middleware/authorization");
+const authjwt = require("../../middleware/authenticate_token");
 const router = require("express").Router();
 
-router.get("/", productController.index);
-router.get("/create", productController.add);
-router.post("/create", productController.create);
+router.get("/",authjwt, authPage(["ADM","MOD"]), productController.index);
+router.get("/create",authjwt, authPage(["ADM","MOD"]), productController.add);
+router.post("/create",authjwt, authPage(["ADM","MOD"]), productController.create);
 
-router.get("/edit/:id", productController.edit);
-router.put("/edit/:id", productController.update);
+router.get("/edit/:id",authjwt, authPage(["ADM","MOD"]), productController.edit);
+router.put("/edit/:id",authjwt, authPage(["ADM","MOD"]), productController.update);
 
-router.delete("/delete/:id", productController.delete);
+router.delete("/delete/:id",authjwt, authPage(["ADM","MOD"]), productController.delete);
 
 module.exports = router;

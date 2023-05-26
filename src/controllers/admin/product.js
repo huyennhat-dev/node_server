@@ -8,6 +8,7 @@ const {
   CLOUDINARY_API_SECRET,
   CLOUDINARY_NAME,
 } = require("../../config");
+const { adminModel } = require("../../models/admin");
 const cloudinary = require("cloudinary").v2;
 
 cloudinary.config({
@@ -58,6 +59,7 @@ const productController = {
   },
   create: async (req, res) => {
     try {
+      const uid = req.user.sub.id;
       const data = req.body;
       const photos = [];
       if (data.photos) {
@@ -72,12 +74,16 @@ const productController = {
       if (data.sale) {
         data.sale = data.sale / 100;
       }
-
+      data.extraPerson = uid;
       // for (let i = 0; i <= 100; i++) {
       // data.name = req.body.name + "thứ" + i;
       const product = await productModel.create(data);
       await categoriesModel.updateOne(
         { _id: data.categories },
+        { $push: { products: product._id } }
+      );
+      await adminModel.updateOne(
+        { _id: uid },
         { $push: { products: product._id } }
       );
       // }
@@ -178,8 +184,14 @@ const productController = {
   },
   delete: async (req, res) => {
     try {
+      const uid = req.user.sub.id;
       const id = req.params.id;
       await categoriesModel.updateMany(
+        { products: id },
+        { $pull: { products: id } }
+      );
+
+      await adminModel.updateMany(
         { products: id },
         { $pull: { products: id } }
       );
