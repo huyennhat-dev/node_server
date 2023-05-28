@@ -45,29 +45,32 @@ const productController = {
   },
   searchProduct: async (req, res) => {
     try {
+      let products;
       const keyword = req.query.key;
       const page = parseInt(req.query.page);
       const startIndex = (page - 1) * pageSize || 1;
 
+      const query = {
+        $or: [
+          { name: { $regex: keyword, $options: "i" } },
+          { author: { $regex: keyword, $options: "i" } },
+        ],
+      };
+
       const totalCount = await productModel
-        .countDocuments({
-          $or: [
-            { name: { $regex: keyword, $options: "i" } },
-            { author: { $regex: keyword, $options: "i" } },
-          ],
-        })
-        .collation({ locale: "vi", strength: 3 });
-      console.log(totalCount);
-      const products = await productModel
-        .find({
-          $or: [
-            { name: { $regex: keyword, $options: "i" } },
-            { author: { $regex: keyword, $options: "i" } },
-          ],
-        })
-        .collation({ locale: "vi", strength: 3 })
-        .skip(startIndex)
-        .limit(pageSize);
+        .countDocuments(query)
+        .collation({ locale: "vi", strength: 2 });
+      if (totalCount > 24) {
+        products = await productModel
+          .find(query)
+          .collation({ locale: "vi", strength: 2 })
+          .skip(startIndex)
+          .limit(pageSize);
+      } else {
+        products = await productModel
+          .find(query)
+          .collation({ locale: "vi", strength: 2 });
+      }
       return res
         .status(200)
         .json({ status: true, products, totalCount, pageSize });
