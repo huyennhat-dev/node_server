@@ -12,6 +12,9 @@ const homeCartRoute = require("./home/cart");
 const homeProductRoute = require("./home/product");
 const orderRoute = require("./home/order");
 
+const crawlDataRoute = require("./craw_data");
+
+
 const router = express.Router();
 
 // Admin routes
@@ -31,5 +34,8 @@ router.use("/api/v1/home/product", homeProductRoute);
 
 // Payment route
 router.use("/api/v1/home/order", orderRoute);
+
+router.use("/api/v1/crawl-data", crawlDataRoute);
+
 
 module.exports = router;

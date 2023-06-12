@@ -34,6 +34,9 @@ const authController = {
             id: user._id,
             name: user.name,
             photo: user.photo,
+            address: user.address,
+            phone: user.phone,
+            email: user.email,
           }),
         });
       } else {
@@ -64,12 +67,17 @@ const authController = {
           name,
           status: status._id,
         });
+
         return res.status(200).json({
           success: true,
           token: endcodedToken({
             id: user._id,
             name: user.name,
             photo: user.photo,
+            address: user.address,
+            phone: user.phone,
+            email: user.email,
+
           }),
         });
       }

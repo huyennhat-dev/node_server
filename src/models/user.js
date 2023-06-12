@@ -20,7 +20,6 @@ const userSchema = new mongoose.Schema(
       max: 10,
     },
     address: { type: String, min: 10 },
-
     status: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,

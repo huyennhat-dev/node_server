@@ -24,7 +24,9 @@
     "mongoose": "^7.0.2",
     "morgan": "^1.10.0",
     "qs": "^6.7.0",
-    "slug": "^8.2.2"
+    "slug": "^8.2.2",
+    "cheerio": "^1.0.0-rc.12",
+    "request-promise": "^4.2.6"
   },
   "devDependencies": {
     "nodemon": "^2.0.21"
