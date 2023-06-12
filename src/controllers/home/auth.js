@@ -3,6 +3,22 @@ const { userModel } = require("../../models/user");
 const { endcodedToken } = require("../../util/index");
 const bcrypt = require("bcryptjs");
 
+const {
+  CLOUDINARY_API_KEY,
+  CLOUDINARY_API_SECRET,
+  CLOUDINARY_NAME,
+} = require("../../config");
+
+const cloudinary = require("cloudinary").v2;
+
+const { publicId } = require("../../util/index");
+
+cloudinary.config({
+  cloud_name: CLOUDINARY_NAME,
+  api_key: CLOUDINARY_API_KEY,
+  api_secret: CLOUDINARY_API_SECRET,
+});
+
 const authController = {
   login: async (req, res) => {
     try {
@@ -77,7 +93,6 @@ const authController = {
             address: user.address,
             phone: user.phone,
             email: user.email,
-
           }),
         });
       }
@@ -91,6 +106,33 @@ const authController = {
       });
     } catch (error) {
       res.status(500).json({ status: false, error });
+    }
+  },
+  update: async (req, res) => {
+    try {
+      const data = req.body;
+      const id = req.user.sub.id;
+
+      const user = await userModel.findById(id);
+
+      if (user) {
+        if (data.photo && data.photo.length > 100) {
+          if (user.photo) {
+            await cloudinary.uploader.destroy(
+              `images/users/${publicId(user.photo)}`
+            );
+          }
+          const rs = await cloudinary.uploader.upload(data.photo, {
+            folder: "images/users",
+          });
+          data.photo = rs.url;
+        }
+
+        await user.updateOne({ $set: data });
+      }
+      return res.status(200).json({ status: true });
+    } catch (error) {
+      return res.status(500).json({ status: false, message: error });
     }
   },
 };
