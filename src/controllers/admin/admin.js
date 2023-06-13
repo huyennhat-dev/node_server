@@ -11,6 +11,7 @@ const validator = require("email-validator");
 const cloudinary = require("cloudinary").v2;
 
 const { publicId } = require("../../util/index");
+const { userModel } = require("../../models/user");
 
 cloudinary.config({
   cloud_name: CLOUDINARY_NAME,
@@ -35,6 +36,27 @@ const userAdminController = {
           data.status = user.status.name;
           data.statusSlug = statusSlug;
           if (data.roleSlug === "ADM") return null;
+          return data;
+        })
+        .filter((data) => data !== null);
+      console.log(datas);
+      return res.status(200).json({ status: true, users: datas });
+    } catch (error) {
+      return res.status(500).json({ status: false, message: error });
+    }
+  },
+  userIndex: async (req, res) => {
+    try {
+      const users = await userModel
+        .find()
+        .select("-password")
+        .populate(["status"]);
+      const datas = users
+        .map((user) => {
+          const data = user.toObject();
+          const statusSlug = user.status.slug;
+          data.status = user.status.name;
+          data.statusSlug = statusSlug;
           return data;
         })
         .filter((data) => data !== null);
@@ -73,6 +95,7 @@ const userAdminController = {
   create: async (req, res) => {
     try {
       const data = req.body;
+
       if (validator.validate(data.email)) {
         if (data.photo) {
           const rs = await cloudinary.uploader.upload(data.photo, {
@@ -195,9 +218,28 @@ const userAdminController = {
       const user = await adminModel.findById(id);
 
       if (user.photo) {
-        await cloudinary.uploader.destroy(`images/users/${publicId(user.photo)}`);
+        await cloudinary.uploader.destroy(
+          `images/users/${publicId(user.photo)}`
+        );
       }
       await user.deleteOne();
+
+      return res.status(200).json({ status: true });
+    } catch (error) {
+      return res.status(500).json({ status: false, error });
+    }
+  },
+  lock: async (req, res) => {
+    try {
+      const id = req.params.id;
+      let status;
+      const user = await userModel.findById(id).populate({ path: "status" });
+      if (user.status.slug == "hoat-dong") {
+        status = await statusModel.findOne({ slug: "tam-khoa" });
+      } else {
+        status = await statusModel.findOne({ slug: "hoat-dong" });
+      }
+      await user.updateOne({ $set: { status: status._id } });
 
       return res.status(200).json({ status: true });
     } catch (error) {

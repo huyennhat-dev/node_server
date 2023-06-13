@@ -92,7 +92,6 @@ const orderController = {
       vnp_Params["vnp_ReturnUrl"] = returnUrl;
       vnp_Params["vnp_IpAddr"] = ipAddr;
       vnp_Params["vnp_CreateDate"] = createDate;
-
       vnp_Params = sortObject(vnp_Params);
 
       let querystring = require("qs");
@@ -132,14 +131,20 @@ const orderController = {
         .digest("hex");
 
       if (secureHash === signed) {
-        const orderStatus = await orderStatusModel.findOne({
-          slug: "da-thanh-toan",
-        });
+        const rsCode = vnp_Params["vnp_ResponseCode"];
+        if (rsCode == 00) {
+          const orderStatus = await orderStatusModel.findOne({
+            slug: "da-thanh-toan",
+          });
 
-        await orderModel.findByIdAndUpdate(vnp_Params["vnp_TxnRef"], {
-          $set: { orderStatus: orderStatus._id },
-        });
-        return res.redirect(`${CLIENT_URL}/checkout/success`);
+          await orderModel.findByIdAndUpdate(vnp_Params["vnp_TxnRef"], {
+            $set: { orderStatus: orderStatus._id },
+          });
+          return res.redirect(`${CLIENT_URL}/checkout/success`);
+        }
+        return res.redirect(`${CLIENT_URL}/checkout/error`);
+      } else {
+        return res.redirect(`${CLIENT_URL}/checkout/error`);
       }
     } catch (error) {
       return res.status(500).json({ status: false, error });

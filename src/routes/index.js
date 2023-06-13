@@ -6,6 +6,7 @@ const adminOrderStatusRoute = require("./admin/orderStatus");
 const adminProductRoute = require("./admin/product");
 const adminRoute = require("./admin/admin");
 const adminCategoriesRoute = require("./admin/categories");
+const adminOrdersRoute = require("./admin/orders");
 const homeAuthRoute = require("./home/auth");
 const homeIndexRoute = require("./home/index");
 const homeCartRoute = require("./home/cart");
@@ -25,6 +26,7 @@ router.use("/api/v1/admin/order-status", adminOrderStatusRoute);
 router.use("/api/v1/admin/product", adminProductRoute);
 router.use("/api/v1/admin/user", adminRoute);
 router.use("/api/v1/admin/categories", adminCategoriesRoute);
+router.use("/api/v1/admin/orders", adminOrdersRoute);
 
 // Home routes
 router.use("/api/v1/home/auth", homeAuthRoute);

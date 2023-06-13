@@ -50,9 +50,6 @@ const authController = {
             id: user._id,
             name: user.name,
             photo: user.photo,
-            address: user.address,
-            phone: user.phone,
-            email: user.email,
           }),
         });
       } else {
@@ -90,9 +87,6 @@ const authController = {
             id: user._id,
             name: user.name,
             photo: user.photo,
-            address: user.address,
-            phone: user.phone,
-            email: user.email,
           }),
         });
       }
@@ -111,10 +105,9 @@ const authController = {
   update: async (req, res) => {
     try {
       const data = req.body;
-      const id = req.user.sub.id;
+      const uid = req.user.sub.id;
 
-      const user = await userModel.findById(id);
-
+      const user = await userModel.findById(uid);
       if (user) {
         if (data.photo && data.photo.length > 100) {
           if (user.photo) {
@@ -122,17 +115,51 @@ const authController = {
               `images/users/${publicId(user.photo)}`
             );
           }
-          const rs = await cloudinary.uploader.upload(data.photo, {
-            folder: "images/users",
-          });
+
+          const rs = await cloudinary.uploader.upload(
+            "data:image/png;base64," + data.photo,
+            {
+              folder: "images/users",
+            }
+          );
+
           data.photo = rs.url;
         }
 
         await user.updateOne({ $set: data });
       }
-      return res.status(200).json({ status: true });
+
+      return res.status(200).json({
+        status: true,
+        user: {
+          name: user.name,
+          photo: data.photo,
+          phone: user.phone,
+          address: user.address,
+          email: user.email,
+        },
+      });
     } catch (error) {
+      console.log(error);
       return res.status(500).json({ status: false, message: error });
+    }
+  },
+  getUserInfo: async (req, res) => {
+    try {
+      const uid = req.user.sub.id;
+      const rs = await userModel.findById(uid);
+      return res.status(200).json({
+        status: true,
+        user: {
+          name: rs.name,
+          photo: rs.photo,
+          phone: rs.phone,
+          address: rs.address,
+          email: rs.email,
+        },
+      });
+    } catch (error) {
+      console.log(error);
     }
   },
 };

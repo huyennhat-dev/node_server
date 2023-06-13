@@ -26,22 +26,27 @@ const productController = {
     }
   },
   productByCategories: async (req, res) => {
-    const cateSlug = req.params.slug;
+    let products;
+    const slug = req.params.slug;
     const page = parseInt(req.query.page);
     const startIndex = (page - 1) * pageSize || 1;
 
-    const categories = await categoriesModel
-      .findOne({ slug: cateSlug })
-      .populate({
-        path: "products",
-        select: "-categories",
-        options: {
-          skip: startIndex,
-          limit: pageSize,
-        },
-      });
-
-    return res.status(200).json({ categories });
+    const cate = await categoriesModel.findOne({ slug: slug });
+    console.log(cate);
+    const totalCount = await productModel.countDocuments({
+      categories: cate._id,
+    });
+    if (totalCount > 24) {
+      products = await productModel
+        .find({ categories: cate._id })
+        .skip(startIndex)
+        .limit(pageSize);
+    } else {
+      products = await productModel.find({ categories: cate._id });
+    }
+    return res
+      .status(200)
+      .json({ status: true, products, totalCount, pageSize });
   },
   searchProduct: async (req, res) => {
     try {
