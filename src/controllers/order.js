@@ -13,6 +13,7 @@ const {
   VNP_URL,
   CLIENT_URL,
 } = require("../config");
+const { productModel } = require("../models/product");
 
 const sortObject = (obj) => {
   let sorted = {};
@@ -133,13 +134,18 @@ const orderController = {
       if (secureHash === signed) {
         const rsCode = vnp_Params["vnp_ResponseCode"];
         if (rsCode == 00) {
+          const pid = vnp_Params["vnp_TxnRef"];
+
           const orderStatus = await orderStatusModel.findOne({
             slug: "da-thanh-toan",
           });
 
-          await orderModel.findByIdAndUpdate(vnp_Params["vnp_TxnRef"], {
+          const order = await orderModel.findById(pid);
+
+          await order.updateOne({
             $set: { orderStatus: orderStatus._id },
           });
+
           return res.redirect(`${CLIENT_URL}/checkout/success`);
         }
         return res.redirect(`${CLIENT_URL}/checkout/error`);

@@ -1,6 +1,7 @@
 const { orderModel } = require("../../models/order");
 const slug = require("slug");
 const { orderStatusModel } = require("../../models/orderStatus");
+const { productModel } = require("../../models/product");
 const orderController = {
   index: async (req, res) => {
     try {
@@ -76,9 +77,22 @@ const orderController = {
         const ost = await orderStatusModel.findOne({ slug: orderStatus });
         orderStatus = ost._id;
       }
-      await orderModel.findByIdAndUpdate(id, {
+
+      const order = await orderModel.findById(id);
+
+      if (orderStatus == "646d1494ffbb65d423a31646") {
+        for (const pro of order.products) {
+          const quantity = pro.quantity;
+          const x = await productModel.findByIdAndUpdate(pro.product, {
+            $inc: { quantity: -quantity, purchases: +quantity },
+          });
+          console.log(x);
+        }
+      }
+      await order.updateOne({
         $set: { orderStatus: orderStatus },
       });
+
       return res.status(200).json({ status: true });
     } catch (error) {
       return res.status(500).json({ status: false, error });

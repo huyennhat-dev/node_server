@@ -2,12 +2,53 @@ const { productModel } = require("../../models/product");
 const { categoriesModel } = require("../../models/categories");
 
 const indexController = {
-  test: (req, res) => {
-    return res.json({ status: true, message: "api hoat dong" });
-  },
   recommendProduct: async (req, res) => {
     try {
-      const products = await productModel.find().limit(16).exec();
+      const products = await productModel
+        .aggregate([{ $sample: { size: 18 } }])
+        .exec();
+
+      return res.status(200).json({ status: true, products });
+    } catch (error) {
+      return res.status(500).json({ status: false, error });
+    }
+  },
+  newProducts: async (req, res) => {
+    try {
+      const products = await productModel
+        .find()
+        .sort({ createdAt: -1 })
+        .limit(18)
+        .exec();
+      return res.status(200).json({ status: true, products });
+    } catch (error) {
+      return res.status(500).json({ status: false, error });
+    }
+  },
+  saleProducts: async (req, res) => {
+    try {
+      const products = await productModel
+        .find()
+        .sort({ purchases: -1 })
+        .limit(18)
+        .exec();
+      return res.status(200).json({ status: true, products });
+    } catch (error) {
+      return res.status(500).json({ status: false, error });
+    }
+  },
+  sameAuthorProducts: async (req, res) => {
+    try {
+      const author = req.params.author
+      console.log(author);
+      const query = {
+        $or: [{ author: { $regex: author, $options: "i" } }],
+      };
+
+      const products = await productModel
+        .find(query)
+        .collation({ locale: "vi", strength: 2 });
+
       return res.status(200).json({ status: true, products });
     } catch (error) {
       return res.status(500).json({ status: false, error });
