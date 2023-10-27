@@ -13,7 +13,7 @@ const cartController = {
 
       if (!cart) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: false, message: "Không tìm thấy giỏ hàng" });
       }
       const cartItems = [];
@@ -78,7 +78,7 @@ const cartController = {
 
       if (!cart) {
         return res
-          .status(404)
+          .status(200)
           .json({ status: false, message: "Không tìm thấy giỏ hàng" });
       }
       const newCart = [];
