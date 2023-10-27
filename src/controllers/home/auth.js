@@ -66,7 +66,58 @@ const authController = {
       res.status(500).json({ status: false, error });
     }
   },
+  register: async (req, res) => {
+    try {
+      const { name, email, password } = req.body;
 
+      const data = await userModel.findOne({ email }).populate("status");
+
+      if (!data) {
+        const status = await statusModel.findOne({ slug: "hoat-dong" });
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        console.log(hashedPassword)
+
+        const user = await userModel.create({
+          email,
+          name,
+          password: hashedPassword, 
+          status: status._id,
+        });
+
+        return res.status(200).json({
+          success: true,
+          token: endcodedToken({
+            id: user._id,
+            name: user.name,
+            photo: user.photo,
+          }),
+        });
+      }
+    } catch (error) {
+      res.status(500).json({ success: false, error });
+    }
+  },
+
+  loginv2: async (req, res) => {
+    try {
+      const { email, password } = req.body;
+
+      const user = await userModel.findOne({ email }).populate("status");
+      if (user) {
+        return res.status(200).json({
+          success: true,
+          token: endcodedToken({
+            id: user._id,
+            name: user.name,
+            photo: user.photo,
+          }),
+        });
+      }
+    } catch (error) {
+      res.status(500).json({ status: false, error });
+    }
+  },
   loginGoogle: async (req, res) => {
     try {
       const { email, photo, name } = req.body;

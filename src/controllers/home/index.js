@@ -29,7 +29,7 @@ const indexController = {
     try {
       const products = await productModel
         .find()
-        .sort({ purchases: -1 })
+        .sort({ sale: -1 })
         .limit(18)
         .exec();
       return res.status(200).json({ status: true, products });
